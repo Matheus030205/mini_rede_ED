@@ -1,5 +1,5 @@
 #include "minirede.h"
-
+s
 void inicializarMiniRede(MiniRede& rede) {
     // TODO
 }
