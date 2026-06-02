@@ -1,5 +1,5 @@
 #include "minirede.h"
-##### teste 
+## teste 
 void inicializarMiniRede(MiniRede& rede) {
     // TODO
 }
