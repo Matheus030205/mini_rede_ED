@@ -7,7 +7,7 @@ const int TAM_USERNAME = 50;
 const int TAM_NOME = 100;
 const int TAM_TEXTO = 280;
 const int TAM_COMANDO = 30;
-const int TAM_HASH = 1001;
+const int TAM_HASH = 997;
 
 
 
@@ -19,9 +19,9 @@ struct Usuario
 
     NoListaUsuario* seguidos;//NO DO INICIO DA LISTA DE PESSOAS SEGUIDAS
     NoLista_de_Post* posts_do_usuario;//No do inicio da lista de publicacoes
-    // No do inicio dos post do usuario
+    NoFilaNotificacoes *inicio_notificacoes; //USADO PARA TIRAR NOTFICACOES MAIS RECENTES
+    NoFilaNotificacoes *fim_notificacoes;// usado para adicionar NOTIFICACOES
 
-    //no do inicio e fim da fila duplamente encadeada das notificacoes
 
 };
 
@@ -56,10 +56,20 @@ struct NoLista_de_Post
     Publicacao *publicacao_atual;
 };
 
+struct NoFilaNotificacoes
+{
+    char tipo;
+    int de_usuario_id;
+    int post_ID;
+    NoFilaNotificacoes* prox;
+};
+
 struct NoHashUsuario
 {
-    /* data */
+    Usuario *usuario;
+    NoHashUsuario *prox;
 };
+
 
 // TODO: definir as structs principais do trabalho.
 //
@@ -107,6 +117,9 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
 void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida);
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida);
 
+
+void liberarListadeCurtidas(NoListaUsuario* inicio);
+void liberarpostGLobal(MiniRede& rede)
 // TODO: declarar aqui as funcoes auxiliares escolhidas pelo grupo.
 //
 // Exemplos de responsabilidades auxiliares:

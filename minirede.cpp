@@ -1,11 +1,18 @@
 #include "minirede.h"
 
 void inicializarMiniRede(MiniRede& rede) {
-    // TODO
+    rede.raiz_id = nullptr;
+    rede.todos_os_posts = nullptr;
+    for (int i = 0; i < TAM_HASH; i++)
+    {
+        rede.tabela_usernames[i] = nullptr;
+    }
+    
 }
 
 void liberarMiniRede(MiniRede& rede) {
     // TODO
+
 }
 
 void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& saida) {
