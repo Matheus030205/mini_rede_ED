@@ -2,6 +2,7 @@
 #define MINI_REDE_H
 
 #include <iostream>
+#include "funcoes_auxiliares.cpp"
 
 const int TAM_USERNAME = 50;
 const int TAM_NOME = 100;
@@ -119,7 +120,7 @@ void listarTopPosts(MiniRede& rede, int k, std::ostream& saida);
 
 
 void liberarListadeCurtidas(NoListaUsuario* inicio);
-void liberarpostGLobal(MiniRede& rede)
+void liberarpostGLobal(MiniRede& rede);
 // TODO: declarar aqui as funcoes auxiliares escolhidas pelo grupo.
 //
 // Exemplos de responsabilidades auxiliares:
