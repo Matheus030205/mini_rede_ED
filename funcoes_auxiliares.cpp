@@ -2,7 +2,7 @@
 
 
 
-/// FUNCAO AUXILIAR PRA LIMPAR LISTA DE USUARIOS QUE CURTIRAR A PUBLICACAO;
+/// FUNCAO AUXILIARES PARA LIBERAR_MINIREDE
 void liberarListadeUsuarios(NoListaUsuario* inicio){
     NoListaUsuario* atual = inicio;
     while (atual != nullptr)
@@ -11,6 +11,7 @@ void liberarListadeUsuarios(NoListaUsuario* inicio){
         delete atual;
         atual= proximo;
     }
+    return;
 }
 void liberarpostGLobal(MiniRede& rede){
 
@@ -79,4 +80,63 @@ void liberarTabelaHash(NoHashUsuario* inicio[]){
         }
         inicio[i]= nullptr;
     } 
+}
+//FUNCAO AUXILIARES DA ADD_USER
+Usuario* buscarArvoreporID(NoArvoreUsuarios*raiz,int id){
+    if (raiz == nullptr)
+    {
+        return nullptr;
+    }
+    if (raiz ->usuario != nullptr && raiz->usuario->id){
+        return raiz->usuario;
+    }
+    if (id< raiz->usuario->id)
+    {
+       return buscarArvoreporID(raiz->esq,id);
+    }else{
+       return buscarArvoreporID(raiz->dir,id);
+    }
+    
+}
+int gerarIndiceHash(const char* username){
+    int soma = 0;
+    for(int i=0;username[i]!= '\0';i++){
+        soma+= username[i];
+    }
+    return soma% TAM_HASH;
+}
+Usuario* buscarHashPorUsername(NoHashUsuario* tabela[],const char* username_procurado){
+    int indice = gerarIndiceHash(username_procurado);
+
+    NoHashUsuario* atual = tabela[indice];
+    while(atual != nullptr){
+        if(atual->usuario != nullptr && strcmp(atual->usuario->username,username_procurado))
+        {
+            return atual->usuario;
+        }
+        atual = atual ->prox;
+    }
+    return nullptr;
+}
+void inserirnaArvore(NoArvoreUsuarios*& raiz, Usuario* novo_usuario){
+    if (raiz == nullptr){
+        raiz = new NoArvoreUsuarios{novo_usuario,nullptr,nullptr};
+        return;
+    }
+    if(novo_usuario->id < raiz->usuario->id){
+        inserirnaArvore(raiz->esq,novo_usuario);
+    }else{
+        inserirnaArvore(raiz->dir,novo_usuario);
+    }
+}
+void inserirNaTabelaHash(NoHashUsuario* tabela[], Usuario* novo_usuario){
+    int indice = gerarIndiceHash(novo_usuario->username);
+    NoHashUsuario* novo_no = new NoHashUsuario;
+
+    novo_no->usuario = novo_usuario;
+
+    novo_no->prox = tabela[indice];
+
+    tabela[indice] = novo_no;
+
 }

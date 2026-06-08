@@ -26,7 +26,11 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
 }
 
 void cadastrarUsuario(MiniRede& rede, int id, const char username[], const char nomeCompleto[], std::ostream& saida) {
-    // TODO
+    if (buscarArvoreporID(rede.raiz_id,id) != nullptr)
+    {
+        std::cout <<"ERROR USER_EXISTS"<< std::endl;
+    }
+    
 }
 
 void buscarUsuarioPorId(MiniRede& rede, int id, std::ostream& saida) {

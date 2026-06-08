@@ -2,7 +2,7 @@
 #define MINI_REDE_H
 
 #include <iostream>
-#include "funcoes_auxiliares.cpp"
+
 
 const int TAM_USERNAME = 50;
 const int TAM_NOME = 100;
@@ -127,6 +127,13 @@ void liberarListaPostdoUsuario(NoLista_de_Post* inicio);
 void liberarFilaNotificacoes(NoFilaNotificacoes * inicio);
 void liberarArvoredeUsuarios(NoArvoreUsuarios* raiz);
 void liberarTabelaHash(NoHashUsuario* inicio[]);
+
+Usuario* buscarArvoreporID(NoArvoreUsuarios*raiz,int id);
+int gerarIndiceHash(const char* username);
+Usuario* buscarHashPorUsername(NoHashUsuario* tabela[],const char* username_procurado);
+void inserirnaArvore(NoArvoreUsuarios*& raiz, Usuario* novo_usuario);
+void inserirNaTabelaHash(NoHashUsuario* tabela[], Usuario* novo_usuario);
+
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username
