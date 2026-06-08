@@ -68,3 +68,15 @@ void liberarArvoredeUsuarios(NoArvoreUsuarios* raiz){
     }
     delete raiz;
 }
+void liberarTabelaHash(NoHashUsuario* inicio[]){
+    for(int i = 0 ; i< TAM_HASH;i++){
+        NoHashUsuario *atual = inicio[i];
+        while (atual != nullptr)
+        {
+            NoHashUsuario*prox = atual->prox;
+            delete atual;
+            atual = prox;
+        }
+        inicio[i]= nullptr;
+    } 
+}

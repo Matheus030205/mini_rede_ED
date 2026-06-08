@@ -12,6 +12,10 @@ void inicializarMiniRede(MiniRede& rede) {
 
 void liberarMiniRede(MiniRede& rede) {
     // TODO
+    liberarpostGLobal(rede);
+    liberarArvoredeUsuarios(rede.raiz_id);
+    rede.raiz_id = nullptr;
+    liberarTabelaHash(rede.tabela_usernames);
 
 }
 

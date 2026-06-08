@@ -119,13 +119,14 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida);
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida);
 
 
+// TODO: declarar aqui as funcoes auxiliares escolhidas pelo grupo.
+//
 void liberarListadeUsuarios(NoListaUsuario* inicio);
 void liberarpostGLobal(MiniRede& rede);
 void liberarListaPostdoUsuario(NoLista_de_Post* inicio);
-void liberarFilaNotificacoes(NoFilaNotificacoes * inicio)
+void liberarFilaNotificacoes(NoFilaNotificacoes * inicio);
 void liberarArvoredeUsuarios(NoArvoreUsuarios* raiz);
-// TODO: declarar aqui as funcoes auxiliares escolhidas pelo grupo.
-//
+void liberarTabelaHash(NoHashUsuario* inicio[]);
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username
