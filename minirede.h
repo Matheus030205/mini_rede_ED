@@ -119,8 +119,11 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida);
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida);
 
 
-void liberarListadeCurtidas(NoListaUsuario* inicio);
+void liberarListadeUsuarios(NoListaUsuario* inicio);
 void liberarpostGLobal(MiniRede& rede);
+void liberarListaPostdoUsuario(NoLista_de_Post* inicio);
+void liberarFilaNotificacoes(NoFilaNotificacoes * inicio)
+void liberarArvoredeUsuarios(NoArvoreUsuarios* raiz);
 // TODO: declarar aqui as funcoes auxiliares escolhidas pelo grupo.
 //
 // Exemplos de responsabilidades auxiliares:

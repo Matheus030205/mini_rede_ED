@@ -3,7 +3,7 @@
 
 
 /// FUNCAO AUXILIAR PRA LIMPAR LISTA DE USUARIOS QUE CURTIRAR A PUBLICACAO;
-void liberarListadeCurtidas(NoListaUsuario* inicio){
+void liberarListadeUsuarios(NoListaUsuario* inicio){
     NoListaUsuario* atual = inicio;
     while (atual != nullptr)
     {
@@ -13,6 +13,7 @@ void liberarListadeCurtidas(NoListaUsuario* inicio){
     }
 }
 void liberarpostGLobal(MiniRede& rede){
+
     NoLista_de_Post* atual = rede.todos_os_posts;
 
     while (atual != nullptr)
@@ -20,7 +21,7 @@ void liberarpostGLobal(MiniRede& rede){
         NoLista_de_Post* prox = atual->prox;
 
         if(atual->publicacao_atual != nullptr){
-            liberarListadeCurtidas(atual->publicacao_atual->curtidas);
+            liberarListadeUsuarios(atual->publicacao_atual->curtidas);
             //Depois de deletar lista de curtidas deleta a struct da publicacao
             delete atual->publicacao_atual;
         }
@@ -31,4 +32,39 @@ void liberarpostGLobal(MiniRede& rede){
     rede.todos_os_posts = nullptr;
     //POR FINAL LIBERAR O PONTEIRO GLOBAL DAS PUBLICACOES
     
+}
+void liberarListaPostsdoUsuario(NoLista_de_Post* inicio){
+    NoLista_de_Post *atual = inicio;
+    while (atual != nullptr)
+    {
+        NoLista_de_Post *prox = atual->prox;
+        delete atual;//DELETA NO DA LISTA, N O POST;
+        atual =prox;
+    }
+}
+void liberarFilaNotificacoes(NoFilaNotificacoes * inicio){
+    NoFilaNotificacoes* atual= inicio;
+
+    while (atual!= nullptr)
+    {
+        NoFilaNotificacoes *prox= atual->prox;
+        delete atual;
+        atual = prox;
+    }
+}
+void liberarArvoredeUsuarios(NoArvoreUsuarios* raiz){
+    if (raiz == nullptr) return;
+
+    liberarArvoredeUsuarios(raiz->esq);
+    liberarArvoredeUsuarios(raiz->dir);
+
+    if (raiz->usuario != nullptr)
+    {
+        liberarListadeUsuarios(raiz->usuario->seguidos);
+        liberarListaPostsdoUsuario(raiz->usuario->posts_do_usuario);
+        liberarFilaNotificacoes(raiz->usuario->inicio_notificacoes);
+
+        delete raiz->usuario;
+    }
+    delete raiz;
 }
