@@ -193,3 +193,36 @@ void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,i
     }
     return;
 }
+///FUNCOES AUXILIAR CADASTRAR PUBLICACAO
+void inserirNalistaPosts(NoLista_de_Post*& inicio_lista,int post_id,const char texto[],int autor_id,int timestamp){
+    Publicacao* nova_publicacao = new Publicacao();
+    nova_publicacao->id_da_publicacao = post_id;
+    nova_publicacao->autor_id= autor_id;
+    nova_publicacao->timestamp = timestamp;
+    strcpy(nova_publicacao->texto_da_publicacao,texto);
+    nova_publicacao->qtd_likes = 0;
+    nova_publicacao->curtidas = nullptr;
+    NoLista_de_Post*novo = new NoLista_de_Post();
+    novo->publicacao_atual = nova_publicacao;
+    novo->prox = inicio_lista;
+    inicio_lista = novo;
+}
+//FUNCAO AUXILIAR CURTIR PUBLICACAO
+Publicacao* buscarPostNalista(NoLista_de_Post*inicio_lista,int id_procurado){
+    NoLista_de_Post* atual = inicio_lista;
+    while (atual != nullptr)
+    {
+        if(atual ->publicacao_atual != nullptr && atual->publicacao_atual->id_da_publicacao == id_procurado){
+            return atual->publicacao_atual;
+        }
+        atual = atual->prox;
+    }
+    return nullptr;
+}
+void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu){
+    NoListaUsuario* novo_no -= new NoListaUsuario();
+    novo_no->id = id_quem_curitu;
+    novo_no-> prox = inicio_lista;
+    inicio_lista=novo_no;
+}
+

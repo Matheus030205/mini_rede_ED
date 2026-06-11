@@ -144,11 +144,40 @@ void listarSeguindo(MiniRede& rede, int idUsuario, std::ostream& saida) {
 }
 
 void cadastrarPublicacao(MiniRede& rede, int idPost, int idAutor, int timestamp, const char texto[], std::ostream& saida) {
-    // TODO
+    Usuario *autor_da_publi = buscarArvoreporID(rede.raiz_id,idAutor);
+    if (autor_da_publi== nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND"<< std:: endl;
+        return;
+    }
+    inserirNalistaPosts(autor_da_publi->posts_do_usuario,idPost,texto,idAutor,timestamp);
+
+    saida <<"POST_ADDED"<< std::endl;
+    
 }
 
 void curtirPublicacao(MiniRede& rede, int idUsuario, int idPost, std::ostream& saida) {
-    // TODO
+    Usuario* usuario_curtiu = buscarArvoreporID(rede.raiz_id,idUsuario);
+    if(usuario_curtiu == nullptr){
+        saida <<"ERROR USER_NOT_FOUND"<< std::endl;
+        return;
+    }
+    Usuario* autor_post = buscarArvoreporID(rede.raiz_id,idPost);
+    if (autor_post == nullptr)
+    {
+         saida <<"ERROR USER_NOT_FOUND"<< std::endl;
+        return;    
+    }
+    Publicacao *post_alvo = buscarPostNalista(autor_post->posts_do_usuario,idPost)
+    if (post_alvo == nullptr)
+    {
+        saida << "ERROR POST_NOT_FOUND"<< std:: endl;
+        return;
+    }
+    
+    
+    
+
 }
 
 void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {

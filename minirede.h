@@ -35,7 +35,7 @@ struct Publicacao
     int qtd_likes;
 
     NoListaUsuario* curtidas;//LISTA DE IDS QUEM CURTIU O POST
-    //Ponteiro inicio da lista de usuario q curtiram a publicacao
+
 
 };
 
@@ -138,6 +138,12 @@ bool jaSegueUsuario(NoListaUsuario* inicio_lista,int id_alvo);
 void percorrerArvoreEmOrdem(NoArvoreUsuarios* raiz,std::ostream& saida);
 void InserirNalistadeSeguidos(NoListaUsuario*& inicio_lista,int id_a_seguir);
 void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,int id_do_post);
+void inserirNalistaPosts(NoLista_de_Post*& inicio_lista,int post_id,const char texto[],int autor_id,int timestamp);
+
+void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu);
+Publicacao* buscarPostNalista(NoLista_de_Post*inicio_lista,int id_procurado);
+
+
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username
