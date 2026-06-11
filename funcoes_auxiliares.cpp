@@ -1,5 +1,5 @@
 #include "minirede.h";
-
+#include <cstring>
 
 
 /// FUNCAO AUXILIARES PARA LIBERAR_MINIREDE
@@ -139,4 +139,57 @@ void inserirNaTabelaHash(NoHashUsuario* tabela[], Usuario* novo_usuario){
 
     tabela[indice] = novo_no;
 
+}
+//FUNCAO AUXILIAR LISTAR USUARIO ORDEM CRESCENTE ID
+void percorrerArvoreEmOrdem(NoArvoreUsuarios* raiz,std::ostream& saida){
+    if(raiz == nullptr) return;
+
+    percorrerArvoreEmOrdem(raiz->esq,saida);
+
+    if (raiz->usuario != nullptr)
+    {
+        saida << "USER " 
+              << raiz->usuario->id << " " 
+              << raiz->usuario->username << " " 
+              << raiz->usuario->nome << std::endl;
+    }
+    percorrerArvoreEmOrdem(raiz->dir,saida);
+}
+//FUNCAO AUXILIARES PARA FOLLOW_USER
+bool jaSegueUsuario(NoListaUsuario* inicio_lista,int id_alvo){
+    NoListaUsuario* atual = inicio_lista;
+    while (atual != nullptr)
+    {
+        if (atual->id == id_alvo)
+        {
+            return true;
+        }
+        atual = atual->prox;
+    }
+    return false;
+}
+void InserirNalistadeSeguidos(NoListaUsuario*& inicio_lista,int id_a_seguir){
+    NoListaUsuario *novo_no = new NoListaUsuario;
+
+    novo_no->id = id_a_seguir;
+    novo_no->prox = inicio_lista;
+
+    inicio_lista = novo_no;
+}
+void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,int id_do_post){
+    NoFilaNotificacoes*novo_no = new NoFilaNotificacoes();
+
+    novo_no->tipo = tipo;
+    novo_no->de_usuario_id = id_de_origem;
+    novo_no->post_ID = id_do_post;
+    novo_no->prox = nullptr;
+
+    if(usuario_recebe->inicio_notificacoes == nullptr){
+        usuario_recebe->inicio_notificacoes = novo_no;
+        usuario_recebe->fim_notificacoes = novo_no;
+    }else{
+        usuario_recebe->fim_notificacoes->prox = novo_no;
+        usuario_recebe->fim_notificacoes = novo_no;
+    }
+    return;
 }

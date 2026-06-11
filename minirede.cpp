@@ -1,5 +1,5 @@
 #include "minirede.h"
-
+#include <cstring>
 void inicializarMiniRede(MiniRede& rede) {
     rede.raiz_id = nullptr;
     rede.todos_os_posts = nullptr;
@@ -28,29 +28,119 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
 void cadastrarUsuario(MiniRede& rede, int id, const char username[], const char nomeCompleto[], std::ostream& saida) {
     if (buscarArvoreporID(rede.raiz_id,id) != nullptr)
     {
-        std::cout <<"ERROR USER_EXISTS"<< std::endl;
+        saida <<"ERROR USER_EXISTS"<< std::endl;
+        return;
     }
+    if (buscarHashPorUsername(rede.tabela_usernames,username)!=nullptr )
+    {
+        saida <<"ERROR USER_EXISTS"<< std :: endl;
+        return;
+    }
+    Usuario* novo_usuario = new Usuario;
+
+    novo_usuario->id = id;
+    strcpy(novo_usuario->nome,nomeCompleto);
+    strcpy(novo_usuario->username, username);
+    
+    novo_usuario->posts_do_usuario = nullptr;
+    novo_usuario->inicio_notificacoes = nullptr;
+    novo_usuario->fim_notificacoes = nullptr;
+    novo_usuario->seguidos = nullptr;
+    
+    inserirnaArvore(rede.raiz_id,novo_usuario);
+    inserirNaTabelaHash(rede.tabela_usernames,novo_usuario);
+
+    saida <<"USER_ADDED"<< std::endl;
     
 }
 
 void buscarUsuarioPorId(MiniRede& rede, int id, std::ostream& saida) {
-    // TODO
+    Usuario *user_found = buscarArvoreporID(rede.raiz_id,id);
+
+    if (user_found ==nullptr)
+    {
+        saida <<"ERROR USER_NOT_FOUND" <<std::endl;
+        return;
+    }
+    saida<< "USER_FOUND "
+    <<user_found->id<<" "
+    <<user_found->username<<" "
+    <<user_found->nome<< std:: endl;
+    return;
+    
 }
 
 void buscarUsuarioPorUsername(MiniRede& rede, const char username[], std::ostream& saida) {
-    // TODO
+        Usuario* user_found = buscarHashPorUsername(rede.tabela_usernames,username);
+
+        if (user_found == nullptr)
+        {
+            saida<< "ERROR USER_NOT_FOUND" <<std:: endl;
+            return;
+        }
+
+    saida<< "USER_FOUND "
+    <<user_found->id<<" "
+    <<user_found->username<<" "
+    <<user_found->nome<< std:: endl;
+    return;
+        
 }
 
 void listarUsuarios(MiniRede& rede, std::ostream& saida) {
-    // TODO
+    saida <<"USERS_BEGIN" << std:: endl;
+
+    if (rede.raiz_id != nullptr)
+    {
+        percorrerArvoreEmOrdem(rede.raiz_id,saida);
+    }
+
+    saida << "USERS_END"<< std::endl;
+    
 }
 
 void seguirUsuario(MiniRede& rede, int idSeguidor, int idSeguido, std::ostream& saida) {
-    // TODO
+    Usuario*seguidor = buscarArvoreporID(rede.raiz_id,idSeguidor);
+    Usuario *seguido = buscarArvoreporID(rede.raiz_id,idSeguido);
+
+    if(seguidor == nullptr || seguido ==nullptr){saida<<"USER_NOT_FOUND"<<endl;return;}
+    if (jaSegueUsuario(seguidor->seguidos,idSeguido))
+    {
+        saida <<"ERROR USER_ALREADY_FOLLOWING"<< std::endl;return;
+    }
+
+    InserirNalistadeSeguidos(seguidor->seguidos,idSeguido);
+    enfileiraNotificacao(seguido,'F',idSeguidor,-1);
+
+    saida << "USER_FOLLOWED" <<std:: endl;
 }
 
 void listarSeguindo(MiniRede& rede, int idUsuario, std::ostream& saida) {
-    // TODO
+    Usuario* usuario_principal = buscarArvoreporID(rede.raiz_id,idUsuario);
+    if (usuario_principal ==nullptr)
+    {
+        saida <<"ERROR USER_NOT_FOUND"<< std:: endl;
+        return;
+    }
+    saida <<"FOLLOWING BEGIN" << std::endl;
+
+    NoListaUsuario*atual= usuario_principal->seguidos;
+
+    while (atual != nullptr)
+    {
+        Usuario*seguido = buscarArvoreporID(rede.raiz_id,atual->id);
+
+        if (seguido!= nullptr)
+        {
+            saida << "USER " 
+            << seguido->id << " " 
+            << seguido->username << " " 
+            << seguido->nome << std::endl;
+        }
+        atual = atual->prox;
+    }
+    saida <<"FOLLOWING_END"<<std::endl;
+    
 }
 
 void cadastrarPublicacao(MiniRede& rede, int idPost, int idAutor, int timestamp, const char texto[], std::ostream& saida) {

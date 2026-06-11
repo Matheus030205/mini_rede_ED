@@ -134,6 +134,10 @@ Usuario* buscarHashPorUsername(NoHashUsuario* tabela[],const char* username_proc
 void inserirnaArvore(NoArvoreUsuarios*& raiz, Usuario* novo_usuario);
 void inserirNaTabelaHash(NoHashUsuario* tabela[], Usuario* novo_usuario);
 
+bool jaSegueUsuario(NoListaUsuario* inicio_lista,int id_alvo);
+void percorrerArvoreEmOrdem(NoArvoreUsuarios* raiz,std::ostream& saida);
+void InserirNalistadeSeguidos(NoListaUsuario*& inicio_lista,int id_a_seguir);
+void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,int id_do_post);
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username
