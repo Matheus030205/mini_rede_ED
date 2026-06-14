@@ -57,13 +57,13 @@ struct NoLista_de_Post
     Publicacao *publicacao_atual;
 };
 
-struct NoFilaNotificacoes
-{
-    char tipo;
-    int de_usuario_id;
-    int post_ID;
-    NoFilaNotificacoes* prox;
-};
+    struct NoFilaNotificacoes
+    {
+        char tipo;
+        int de_usuario_id;
+        int post_ID;
+        NoFilaNotificacoes* prox;
+    };
 
 struct NoHashUsuario
 {
@@ -143,6 +143,7 @@ void inserirNalistaPosts(NoLista_de_Post*& inicio_lista,int post_id,const char t
 void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu);
 Publicacao* buscarPostNalista(NoLista_de_Post*inicio_lista,int id_procurado);
 
+void DesenfileirarNotificacao(Usuario*& User);
 
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id

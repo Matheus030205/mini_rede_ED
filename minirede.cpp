@@ -181,7 +181,39 @@ void curtirPublicacao(MiniRede& rede, int idUsuario, int idPost, std::ostream& s
 }
 
 void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
-    // TODO
+    Usuario*User = buscarArvoreporID(rede.raiz_id,idUsuario);
+    
+    if(User == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND\n"; //Usuario nao encontrado
+    }
+    else if (User->inicio_notificacoes == nullptr)
+    {
+        saida << "ERROR USER_DON'T_HAVE_NOTIFICATIONS\n"; //Usuario nao possui notificações
+    }
+    else
+    {
+        int count = 0;
+        
+        saida << "NOTIFICATIONS_BEGIN\n";
+        
+        while(count < k && User->inicio_notificacoes != nullptr) //Ele deve parar quando chegar no fim da fila e/ou count superar k.
+        {
+            if(User->inicio_notificacoes->tipo == 'F')
+            {
+                saida << "NOTIFICATION FOLLOW " << User->de_usuario_id << "  \n";
+            }
+            if(User->inicio_notificacoes->tipo == 'L')    
+            {
+                saida << "NOTIFICATION LIKE " << User->de_post_ID << "  \n";
+            }
+            
+            DesenfileirarNotificacao(User); // Aqui, ele altera o ponteiro da fila para a proxima notificação, e deleta a atual.
+            count++;
+        }
+        
+        saida << "NOTIFICATIONS_END\n";
+    }
 }
 
 void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
