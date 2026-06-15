@@ -225,4 +225,11 @@ void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu){
     novo_no-> prox = inicio_lista;
     inicio_lista=novo_no;
 }
-
+//FUNCAO AUXILIAR CONSULTAR NOTIFICACOES
+void DesenfileirarNotificacao(Usuario*& User){
+    NoFilaNotificacoes* Notification = User->inicio_notificacoes;
+    
+    User->inicio_notificacoes = Notification->prox;
+    if(User->inicio_notificacoes == nullptr) User->fim_notificacoes = nullptr;
+    delete Notification;
+}
