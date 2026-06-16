@@ -162,22 +162,26 @@ void curtirPublicacao(MiniRede& rede, int idUsuario, int idPost, std::ostream& s
         saida <<"ERROR USER_NOT_FOUND"<< std::endl;
         return;
     }
-    Usuario* autor_post = buscarArvoreporID(rede.raiz_id,idPost);
+    Usuario* autor_post = buscarDonodoPost(rede.raiz_id,idPost);
     if (autor_post == nullptr)
     {
-         saida <<"ERROR USER_NOT_FOUND"<< std::endl;
+         saida <<"ERROR POST_NOT_FOUND"<< std::endl;
         return;    
     }
-    Publicacao *post_alvo = buscarPostNalista(autor_post->posts_do_usuario,idPost)
-    if (post_alvo == nullptr)
+    Publicacao *post_alvo = buscarPostNalista(autor_post->posts_do_usuario,idPost);
+    
+    if (jaCurtiuPost(post_alvo->curtidas,idUsuario))
     {
-        saida << "ERROR POST_NOT_FOUND"<< std:: endl;
+        saida << "ERROR ALREADY_LIKED"<< std:: endl;
         return;
     }
-    
-    
-    
 
+    post_alvo->qtd_likes++;
+    inserirNaListaCurtidas(post_alvo->curtidas,idUsuario);
+
+    enfileirarNotificacao(autor_post,'L',idUsuario,idPost);
+
+    saida << "LIKED" << std:: endl;  
 }
 
 void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {

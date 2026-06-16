@@ -225,6 +225,37 @@ void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu){
     novo_no-> prox = inicio_lista;
     inicio_lista=novo_no;
 }
+Usuario * buscarDonodoPost(NoArvoreUsuarios*raiz, int id_pos_procurado){
+    if (raiz == nullptr) return nullptr;
+    
+    Usuario *encontrado_esq = buscarDonodoPost(raiz->esq,id_pos_procurado);
+    if (encontrado_esq != nullptr) return encontrado_esq;
+
+    NoLista_de_Post* atual_post = raiz->usuario->posts_do_usuario;
+        while (atual_post!= nullptr)
+        {
+            if (atual_post->publicacao_atual != nullptr && atual_post->publicacao_atual->id_da_publicacao==id_pos_procurado)
+            {
+                return raiz->usuario;
+            }
+            atual_post = atual_post->prox;
+        }
+        return buscarDonodoPost(raiz->dir,id_pos_procurado);
+    
+}
+bool jaCurtiuPost(NoListaUsuario* inicio_lista,int id_usuario){
+    NoListaUsuario *atual = inicio_lista;
+    while (atual != nullptr)
+    {
+        if (atual->id==id_usuario)
+        {
+            return true;
+        }
+        atual = atual->prox;
+    }
+    return false;
+    
+}
 //FUNCAO AUXILIAR CONSULTAR NOTIFICACOES
 void DesenfileirarNotificacao(Usuario*& User){
     NoFilaNotificacoes* Notification = User->inicio_notificacoes;

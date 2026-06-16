@@ -142,6 +142,8 @@ void inserirNalistaPosts(NoLista_de_Post*& inicio_lista,int post_id,const char t
 
 void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu);
 Publicacao* buscarPostNalista(NoLista_de_Post*inicio_lista,int id_procurado);
+bool jaCurtiuPost(NoListaUsuario* inicio_lista,int id_usuario);
+Usuario * buscarDonodoPost(NoArvoreUsuarios*raiz, int id_pos_procurado);
 
 void DesenfileirarNotificacao(Usuario*& User);
 
