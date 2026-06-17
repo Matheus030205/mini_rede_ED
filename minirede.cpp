@@ -221,7 +221,32 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
 }
 
 void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
-    // TODO
+    Usuario*User = buscarArvoreporID(rede.raiz_id,idUsuario);
+
+    if(User == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND\n"; //Usuario nao encontrado
+    }
+    else
+    {
+        Publicacao** Posts = new Publicacao*[k];
+        TimestampSort(User, k, Posts[k]);
+        
+        saida << "NOTIFICATIONS_BEGIN\n";
+     
+        for(int i = 0; i < k; i++)
+        {
+           saida << "POST " 
+           <<Posts[i]->id_da_publicacao<<" "
+           <<Posts[i]->autor_id<<" "
+           <<Posts[i]->timestamp<<" "
+           <<Posts[i]->qtd_likes<<" "
+           <<Posts[i]->texto_da_publicacao<<" " std::endl;
+        }
+    
+        saida << "NOTIFICATIONS_END\n";
+        delete Posts[k];
+    }
 }
 
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {

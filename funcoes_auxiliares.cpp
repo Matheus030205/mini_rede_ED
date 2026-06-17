@@ -264,3 +264,68 @@ void DesenfileirarNotificacao(Usuario*& User){
     if(User->inicio_notificacoes == nullptr) User->fim_notificacoes = nullptr;
     delete Notification;
 }
+//FUNCAO AUXILIAR GERAR FEED
+bool ComparaPost(Publicacao* atual, Publicacao* anterior){
+    if(atual->timestamp != anterior->timestamp)
+    {
+        return atual->timestamp > anterior->timestamp;
+    }
+    return atual->id_da_publicacao < anterior->id_da_publicacao;
+}
+void TimestampSort(Usuario*& User, int k, Publicacao** Posts){
+    NoListaUsuario* following = User->seguidos;
+    int qtde_post = 0;
+
+    while(following != nullptr)
+    {
+        Usuario* usuario_temp = buscarArvoreporID(rede.raiz_id,following->id);
+        NoLista_de_Post* post_temp = usuario_temp->posts_do_usuario;
+        
+        while(post_temp != nullptr)
+        {
+            Publicacao* post_atual = post_temp->publicacao_atual;
+            
+            if(qtde_post < k)
+            {
+                Posts[qtde_post] = post_atual; //Ta errado, se começarmos com o count = 0, o for nunca vai rodar pois é i = count - 1, e a parada do for eh i > 0, i--. O for nunca vai rodar, e se fizermos count = 1, nunca acessaremos o indice 0 do vetor.
+                qtde_post++;
+                
+                if(qtde_post > 1)
+                {
+                    for(int i = qtde_post - 1; i > 0; i--)
+                    {
+                        if(ComparaPost(Posts[i], Posts[i-1]))
+                        {
+                            Publicacao* swap = Posts[i];
+                            Posts[i] = Posts[i-1];
+                            Posts[i-1] = swap;
+                        }
+                    }
+                }
+                
+            }
+            
+            else
+            {
+                if(ComparaPost(post_atual, Posts[k-1]))
+                {
+                    Posts[k-1] = post_atual
+                    for(int i = k - 1; i > 0; i--)
+                    {
+                        if(ComparaPost(Posts[i], Posts[i-1]))
+                        {
+                            Publicacao* swap = Posts[i];
+                            Posts[i] = Posts[i-1];
+                            Posts[i-1] = swap;
+                        }
+                    }
+                }
+            }
+            
+            post_temp = post_temp->prox;
+        }
+        
+        following = following->prox;
+    }
+    
+}
