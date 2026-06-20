@@ -264,3 +264,126 @@ void DesenfileirarNotificacao(Usuario*& User){
     if(User->inicio_notificacoes == nullptr) User->fim_notificacoes = nullptr;
     delete Notification;
 }
+//FUNCAO AUXILIAR GERAR FEED
+bool ComparaPost(Publicacao* atual, Publicacao* anterior){
+    if(atual->timestamp != anterior->timestamp)
+    {
+        return atual->timestamp > anterior->timestamp;
+    }
+    return atual->id_da_publicacao < anterior->id_da_publicacao;
+}
+void TimestampSort(Usuario*& User, int k, Publicacao** Posts){
+    NoListaUsuario* following = User->seguidos;
+    int qtde_post = 0;
+
+    while(following != nullptr)
+    {
+        Usuario* usuario_temp = buscarArvoreporID(rede.raiz_id,following->id);
+        NoLista_de_Post* post_temp = usuario_temp->posts_do_usuario;
+        
+        while(post_temp != nullptr)
+        {
+            Publicacao* post_atual = post_temp->publicacao_atual;
+            
+            if(qtde_post < k)
+            {
+                Posts[qtde_post] = post_atual; 
+                qtde_post++;
+                
+                if(qtde_post > 1)
+                {
+                    for(int i = qtde_post - 1; i > 0; i--)
+                    {
+                        if(ComparaPost(Posts[i], Posts[i-1]))
+                        {
+                            Publicacao* swap = Posts[i];
+                            Posts[i] = Posts[i-1];
+                            Posts[i-1] = swap;
+                        }
+                    }
+                }
+                
+            }
+            
+            else
+            {
+                if(ComparaPost(post_atual, Posts[k-1]))
+                {
+                    Posts[k-1] = post_atual;
+                    for(int i = k - 1; i > 0; i--)
+                    {
+                        if(ComparaPost(Posts[i], Posts[i-1]))
+                        {
+                            Publicacao* swap = Posts[i];
+                            Posts[i] = Posts[i-1];
+                            Posts[i-1] = swap;
+                        }
+                    }
+                }
+            }
+            
+            post_temp = post_temp->prox;
+        }
+        
+        following = following->prox;
+    }
+    
+}
+
+//FUNCAO AUXILIAR TOP POSTS
+bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior){
+    if(atual->curtidas != anterior->curtidas)
+    {
+        return atual->curtidas > anterior->curtidas;
+    }
+    return atual->id_da_publicacao < anterior->id_da_publicacao;
+}
+void CurtidasSort(NoArvoreUsuarios* raiz, int k, int& qtde_post, Publicacao** Posts){
+    if(raiz == nullptr) return nullptr;
+    CurtidasSort(raiz->esq, k, qtde_post, Posts);
+    CurtidasSort(raiz->dir, k, qtde_post, Posts);
+
+    NoLista_de_Post* post_temp = raiz->usuario->posts_do_usuario;
+        
+    while(post_temp != nullptr)
+    {
+        Publicacao* post_atual = post_temp->publicacao_atual; 
+        
+        if(qtde_post < k)
+        {
+            Posts[qtde_post] = post_atual; 
+            qtde_post++;
+            
+            if(qtde_post > 1)
+            {
+                for(int i = qtde_post - 1; i > 0; i--)
+                {
+                    if(ComparaCurtidas(Posts[i], Posts[i-1]))
+                    {
+                        Publicacao* swap = Posts[i];
+                        Posts[i] = Posts[i-1];
+                        Posts[i-1] = swap;
+                    }
+                }
+            }   
+        }
+        else
+        {
+            if(ComparaCurtidas(post_atual, Posts[k-1]))
+            {
+                Posts[k-1] = post_atual;
+                
+                for(int i = k - 1; i > 0; i--)
+                {
+                    if(ComparaCurtidas(Posts[i], Posts[i-1]))
+                    {
+                        Publicacao* swap = Posts[i];
+                        Posts[i] = Posts[i-1];
+                        Posts[i-1] = swap;
+                    }
+                }
+            }
+        }
+        post_temp = post_temp->prox;
+    }
+}

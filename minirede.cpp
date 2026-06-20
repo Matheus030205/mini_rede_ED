@@ -20,9 +20,95 @@ void liberarMiniRede(MiniRede& rede) {
 }
 
 void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& saida) {
-    // TODO: ler comandos da entrada padrao ate END.
-    // Para cada comando, chamar a funcao correspondente.
-    // Nao imprimir menu, prompt ou texto extra.
+    std::string mnemonico;
+
+    while(entrada >> mnemonico)
+    {
+        if(mnemonico == "END"){
+            break;
+        } 
+        else if(mnemonico == "ADD_USER")
+        {
+            int id;
+            std::string username, nome;
+            entrada >> id >> username >> nome;
+            cadastrarUsuario(rede, id, username, nome, saida);
+        }
+        else if(mnemonico == "FIND_USER")
+        {
+            int id;
+            entrada >> id;
+            buscarUsuarioPorId(rede, id, saida);
+        }
+        else if(mnemonico == "FIND_USERNAME")
+        {
+            std::string username;
+            entrada >> username;
+            buscarUsuarioPorUsername(rede, username, saida);
+        }
+        else if(mnemonico == "LIST_USERS")
+        {
+            listarUsuarios(rede, saida);
+        }
+        else if(mnemonico == "FOLLOW")
+        {
+            int idSeguidor;
+            int idSeguido;
+            entrada >> idSeguidor >> idSeguido;
+            seguirUsuario(MiniRede& rede, idSeguidor, idSeguido, saida);
+        }
+        else if(mnemonico == "LIST_FOLLOWING")
+        {
+            int idUsuario;
+            entrada >> idUsuario;
+            listarSeguindo(rede, idUsuario, saida);
+        }
+        else if(mnemonico == "ADD_POST")
+        {
+            int idPost, idAutor, timestamp;
+            std::string texto;
+            entrada >> idPost >> idAutor >> timestamp >> texto;
+            cadastrarPublicacao(rede, idPost, idAutor, timestamp, texto, saida);
+        }
+        else if(mnemonico == "LIKE")
+        {
+            int idUsuario, idPost;
+            entrada >> idUsuario >> idPost;
+            curtirPublicacao(rede, idUsuario, idPost, saida);
+        }
+        else if(mnemonico == "GET_NOTIFICATIONS")
+        {
+            int idUsuario, k;
+            entrada >> idUsuario >> k;
+            consultarNotificacoes(rede, idUsuario, k, saida);
+        }
+        else if(mnemonico == "FEED")
+        {
+            int idUsuario, k;
+            entrada >> idUsuario >> k;
+            gerarFeedrede(idUsuario, k, saida);
+        }
+        else if(mnemonico == "TOP_POSTS")
+        {
+            int k;
+            entrada >> k;
+            listarTopPosts(rede, k, saida);
+        }
+        else
+        {
+            saida << "ERROR INVALID_COMMAND\n" << std::endl;
+            
+            char c;
+            while(entrada.get(c))
+            {
+                if (c == '\n')
+                {
+                    break;
+                }
+            }
+        }
+    }
+
 }
 
 void cadastrarUsuario(MiniRede& rede, int id, const char username[], const char nomeCompleto[], std::ostream& saida) {
@@ -189,43 +275,86 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
     
     if(User == nullptr)
     {
-        saida << "ERROR USER_NOT_FOUND\n"; //Usuario nao encontrado
+        saida << "ERROR USER_NOT_FOUND\n" << std:: endl; //Usuario nao encontrado
     }
     else if (User->inicio_notificacoes == nullptr)
     {
-        saida << "ERROR USER_DON'T_HAVE_NOTIFICATIONS\n"; //Usuario nao possui notificações
+        saida << "ERROR USER_DON'T_HAVE_NOTIFICATIONS\n" << std:: endl; //Usuario nao possui notificações
     }
     else
     {
         int count = 0;
         
-        saida << "NOTIFICATIONS_BEGIN\n";
+        saida << "NOTIFICATIONS_BEGIN\n" << std:: endl;
         
         while(count < k && User->inicio_notificacoes != nullptr) //Ele deve parar quando chegar no fim da fila e/ou count superar k.
         {
             if(User->inicio_notificacoes->tipo == 'F')
             {
-                saida << "NOTIFICATION FOLLOW " << User->de_usuario_id << "  \n";
+                saida << "NOTIFICATION FOLLOW " << User->de_usuario_id << "  \n" << std:: endl;
             }
             if(User->inicio_notificacoes->tipo == 'L')    
             {
-                saida << "NOTIFICATION LIKE " << User->de_post_ID << "  \n";
+                saida << "NOTIFICATION LIKE " << User->de_post_ID << "  \n" << std:: endl;
             }
             
             DesenfileirarNotificacao(User); // Aqui, ele altera o ponteiro da fila para a proxima notificação, e deleta a atual.
             count++;
         }
         
-        saida << "NOTIFICATIONS_END\n";
+        saida << "NOTIFICATIONS_END\n" << std:: endl;
     }
 }
 
 void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
-    // TODO
+    Usuario*User = buscarArvoreporID(rede.raiz_id,idUsuario);
+
+    if(User == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND\n" << std:: endl; //Usuario nao encontrado
+    }
+    else
+    {
+        Publicacao** Posts = new Publicacao*[k];
+        TimestampSort(User, k, Posts[k]);
+        
+        saida << "FEED_BEGIN\n" << std:: endl;
+     
+        for(int i = 0; i < k; i++)
+        {
+           saida << "POST " 
+           <<Posts[i]->id_da_publicacao<<" "
+           <<Posts[i]->autor_id<<" "
+           <<Posts[i]->timestamp<<" "
+           <<Posts[i]->qtd_likes<<" "
+           <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
+        }
+    
+        saida << "FEED_END\n" << std:: endl;
+        delete Posts[k];
+    }
 }
 
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
-    // TODO
+    Publicacao** Posts = new Publicacao*[k];
+    int qtde_post = 0;
+    
+    CurtidasSort(rede.raiz, k, qtde_post, Posts[k]);
+    
+    saida << "TOP_POSTS_BEGIN\n" << std:: endl;
+    
+    for(int i = 0; i < k; i++)
+    {
+        saida << "POST " 
+        <<Posts[i]->id_da_publicacao<<" "
+        <<Posts[i]->autor_id<<" "
+        <<Posts[i]->timestamp<<" "
+        <<Posts[i]->qtd_likes<<" "
+        <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
+    }
+
+    saida << "TOP_POSTS_END\n" << std:: endl;
+    delete Posts[k];
 }
 
 int main() {
