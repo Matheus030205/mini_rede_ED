@@ -330,7 +330,7 @@ void TimestampSort(Usuario*& User, int k, Publicacao** Posts){
     
 }
 
-//FUNCAO AUXILIAR GERAR FEED
+//FUNCAO AUXILIAR TOP POSTS
 bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior){
     if(atual->curtidas != anterior->curtidas)
     {
@@ -338,60 +338,52 @@ bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior){
     }
     return atual->id_da_publicacao < anterior->id_da_publicacao;
 }
-void CurtidasSort(Usuario*& User, int k, Publicacao** Posts){
-    NoListaUsuario* following = User->seguidos;
-    int qtde_post = 0;
+void CurtidasSort(NoArvoreUsuarios* raiz, int k, int& qtde_post, Publicacao** Posts){
+    if(raiz == nullptr) return nullptr;
+    CurtidasSort(raiz->esq, k, qtde_post, Posts);
+    CurtidasSort(raiz->dir, k, qtde_post, Posts);
 
-    while(following != nullptr)
+    NoLista_de_Post* post_temp = raiz->usuario->posts_do_usuario;
+        
+    while(post_temp != nullptr)
     {
-        Usuario* usuario_temp = buscarArvoreporID(rede.raiz_id,following->id);
-        NoLista_de_Post* post_temp = usuario_temp->posts_do_usuario;
+        Publicacao* post_atual = post_temp->publicacao_atual; 
         
-        while(post_temp != nullptr)
+        if(qtde_post < k)
         {
-            Publicacao* post_atual = post_temp->publicacao_atual;
+            Posts[qtde_post] = post_atual; 
+            qtde_post++;
             
-            if(qtde_post < k)
+            if(qtde_post > 1)
             {
-                Posts[qtde_post] = post_atual; 
-                qtde_post++;
-                
-                if(qtde_post > 1)
+                for(int i = qtde_post - 1; i > 0; i--)
                 {
-                    for(int i = qtde_post - 1; i > 0; i--)
+                    if(ComparaCurtidas(Posts[i], Posts[i-1]))
                     {
-                        if(ComparaCurtidas(Posts[i], Posts[i-1]))
-                        {
-                            Publicacao* swap = Posts[i];
-                            Posts[i] = Posts[i-1];
-                            Posts[i-1] = swap;
-                        }
+                        Publicacao* swap = Posts[i];
+                        Posts[i] = Posts[i-1];
+                        Posts[i-1] = swap;
                     }
                 }
-                
-            }
-            
-            else
-            {
-                if(ComparaCurtidas(post_atual, Posts[k-1]))
-                {
-                    Posts[k-1] = post_atual;
-                    for(int i = k - 1; i > 0; i--)
-                    {
-                        if(ComparaCurtidas(Posts[i], Posts[i-1]))
-                        {
-                            Publicacao* swap = Posts[i];
-                            Posts[i] = Posts[i-1];
-                            Posts[i-1] = swap;
-                        }
-                    }
-                }
-            }
-            
-            post_temp = post_temp->prox;
+            }   
         }
-        
-        following = following->prox;
+        else
+        {
+            if(ComparaCurtidas(post_atual, Posts[k-1]))
+            {
+                Posts[k-1] = post_atual;
+                
+                for(int i = k - 1; i > 0; i--)
+                {
+                    if(ComparaCurtidas(Posts[i], Posts[i-1]))
+                    {
+                        Publicacao* swap = Posts[i];
+                        Posts[i] = Posts[i-1];
+                        Posts[i-1] = swap;
+                    }
+                }
+            }
+        }
+        post_temp = post_temp->prox;
     }
-    
 }

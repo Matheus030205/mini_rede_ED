@@ -20,9 +20,7 @@ void liberarMiniRede(MiniRede& rede) {
 }
 
 void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& saida) {
-    // TODO: ler comandos da entrada padrao ate END.
-    // Para cada comando, chamar a funcao correspondente.
-    // Nao imprimir menu, prompt ou texto extra.
+
 }
 
 void cadastrarUsuario(MiniRede& rede, int id, const char username[], const char nomeCompleto[], std::ostream& saida) {
@@ -250,32 +248,25 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
 }
 
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
-    Usuario*User = buscarArvoreporID(rede.raiz_id,rede.raiz_id->usuario);
-
-    if(User == nullptr)
-    {
-        saida << "ERROR USER_NOT_FOUND\n" << std:: endl; //Usuario nao encontrado
-    }
-    else
-    {
-        Publicacao** Posts = new Publicacao*[k];
-        CurtidasSort(User, k, Posts[k]);
-        
-        saida << "TOP_POSTS_BEGIN\n" << std:: endl;
-     
-        for(int i = 0; i < k; i++)
-        {
-           saida << "POST " 
-           <<Posts[i]->id_da_publicacao<<" "
-           <<Posts[i]->autor_id<<" "
-           <<Posts[i]->timestamp<<" "
-           <<Posts[i]->qtd_likes<<" "
-           <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
-        }
+    Publicacao** Posts = new Publicacao*[k];
+    int qtde_post = 0;
     
-        saida << "TOP_POSTS_END\n" << std:: endl;
-        delete Posts[k];
+    CurtidasSort(rede.raiz, k, qtde_post, Posts[k]);
+    
+    saida << "TOP_POSTS_BEGIN\n" << std:: endl;
+    
+    for(int i = 0; i < k; i++)
+    {
+        saida << "POST " 
+        <<Posts[i]->id_da_publicacao<<" "
+        <<Posts[i]->autor_id<<" "
+        <<Posts[i]->timestamp<<" "
+        <<Posts[i]->qtd_likes<<" "
+        <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
     }
+
+    saida << "TOP_POSTS_END\n" << std:: endl;
+    delete Posts[k];
 }
 
 int main() {
