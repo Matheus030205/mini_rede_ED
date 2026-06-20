@@ -20,6 +20,94 @@ void liberarMiniRede(MiniRede& rede) {
 }
 
 void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& saida) {
+    std::string mnemonico;
+
+    while(entrada >> mnemonico)
+    {
+        if(mnemonico == "END"){
+            break;
+        } 
+        else if(mnemonico == "ADD_USER")
+        {
+            int id;
+            std::string username, nome;
+            entrada >> id >> username >> nome;
+            cadastrarUsuario(rede, id, username, nome, saida);
+        }
+        else if(mnemonico == "FIND_USER")
+        {
+            int id;
+            entrada >> id;
+            buscarUsuarioPorId(rede, id, saida);
+        }
+        else if(mnemonico == "FIND_USERNAME")
+        {
+            std::string username;
+            entrada >> username;
+            buscarUsuarioPorUsername(rede, username, saida);
+        }
+        else if(mnemonico == "LIST_USERS")
+        {
+            listarUsuarios(rede, saida);
+        }
+        else if(mnemonico == "FOLLOW")
+        {
+            int idSeguidor;
+            int idSeguido;
+            entrada >> idSeguidor >> idSeguido;
+            seguirUsuario(MiniRede& rede, idSeguidor, idSeguido, saida);
+        }
+        else if(mnemonico == "LIST_FOLLOWING")
+        {
+            int idUsuario;
+            entrada >> idUsuario;
+            listarSeguindo(rede, idUsuario, saida);
+        }
+        else if(mnemonico == "ADD_POST")
+        {
+            int idPost, idAutor, timestamp;
+            std::string texto;
+            entrada >> idPost >> idAutor >> timestamp >> texto;
+            cadastrarPublicacao(rede, idPost, idAutor, timestamp, texto, saida);
+        }
+        else if(mnemonico == "LIKE")
+        {
+            int idUsuario, idPost;
+            entrada >> idUsuario >> idPost;
+            curtirPublicacao(rede, idUsuario, idPost, saida);
+        }
+        else if(mnemonico == "GET_NOTIFICATIONS")
+        {
+            int idUsuario, k;
+            entrada >> idUsuario >> k;
+            consultarNotificacoes(rede, idUsuario, k, saida);
+        }
+        else if(mnemonico == "FEED")
+        {
+            int idUsuario, k;
+            entrada >> idUsuario >> k;
+            gerarFeedrede(idUsuario, k, saida);
+        }
+        else if(mnemonico == "TOP_POSTS")
+        {
+            int k;
+            entrada >> k;
+            listarTopPosts(rede, k, saida);
+        }
+        else
+        {
+            saida << "ERROR INVALID_COMMAND\n" << std::endl;
+            
+            char c;
+            while(entrada.get(c))
+            {
+                if (c == '\n')
+                {
+                    break;
+                }
+            }
+        }
+    }
 
 }
 
