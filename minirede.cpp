@@ -189,34 +189,34 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
     
     if(User == nullptr)
     {
-        saida << "ERROR USER_NOT_FOUND\n"; //Usuario nao encontrado
+        saida << "ERROR USER_NOT_FOUND\n" << std:: endl; //Usuario nao encontrado
     }
     else if (User->inicio_notificacoes == nullptr)
     {
-        saida << "ERROR USER_DON'T_HAVE_NOTIFICATIONS\n"; //Usuario nao possui notificações
+        saida << "ERROR USER_DON'T_HAVE_NOTIFICATIONS\n" << std:: endl; //Usuario nao possui notificações
     }
     else
     {
         int count = 0;
         
-        saida << "NOTIFICATIONS_BEGIN\n";
+        saida << "NOTIFICATIONS_BEGIN\n" << std:: endl;
         
         while(count < k && User->inicio_notificacoes != nullptr) //Ele deve parar quando chegar no fim da fila e/ou count superar k.
         {
             if(User->inicio_notificacoes->tipo == 'F')
             {
-                saida << "NOTIFICATION FOLLOW " << User->de_usuario_id << "  \n";
+                saida << "NOTIFICATION FOLLOW " << User->de_usuario_id << "  \n" << std:: endl;
             }
             if(User->inicio_notificacoes->tipo == 'L')    
             {
-                saida << "NOTIFICATION LIKE " << User->de_post_ID << "  \n";
+                saida << "NOTIFICATION LIKE " << User->de_post_ID << "  \n" << std:: endl;
             }
             
             DesenfileirarNotificacao(User); // Aqui, ele altera o ponteiro da fila para a proxima notificação, e deleta a atual.
             count++;
         }
         
-        saida << "NOTIFICATIONS_END\n";
+        saida << "NOTIFICATIONS_END\n" << std:: endl;
     }
 }
 
@@ -225,14 +225,14 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
 
     if(User == nullptr)
     {
-        saida << "ERROR USER_NOT_FOUND\n"; //Usuario nao encontrado
+        saida << "ERROR USER_NOT_FOUND\n" << std:: endl; //Usuario nao encontrado
     }
     else
     {
         Publicacao** Posts = new Publicacao*[k];
         TimestampSort(User, k, Posts[k]);
         
-        saida << "NOTIFICATIONS_BEGIN\n";
+        saida << "FEED_BEGIN\n" << std:: endl;
      
         for(int i = 0; i < k; i++)
         {
@@ -241,16 +241,41 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
            <<Posts[i]->autor_id<<" "
            <<Posts[i]->timestamp<<" "
            <<Posts[i]->qtd_likes<<" "
-           <<Posts[i]->texto_da_publicacao<<" " std::endl;
+           <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
         }
     
-        saida << "NOTIFICATIONS_END\n";
+        saida << "FEED_END\n" << std:: endl;
         delete Posts[k];
     }
 }
 
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
-    // TODO
+    Usuario*User = buscarArvoreporID(rede.raiz_id,rede.raiz_id->usuario);
+
+    if(User == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND\n" << std:: endl; //Usuario nao encontrado
+    }
+    else
+    {
+        Publicacao** Posts = new Publicacao*[k];
+        CurtidasSort(User, k, Posts[k]);
+        
+        saida << "TOP_POSTS_BEGIN\n" << std:: endl;
+     
+        for(int i = 0; i < k; i++)
+        {
+           saida << "POST " 
+           <<Posts[i]->id_da_publicacao<<" "
+           <<Posts[i]->autor_id<<" "
+           <<Posts[i]->timestamp<<" "
+           <<Posts[i]->qtd_likes<<" "
+           <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
+        }
+    
+        saida << "TOP_POSTS_END\n" << std:: endl;
+        delete Posts[k];
+    }
 }
 
 int main() {

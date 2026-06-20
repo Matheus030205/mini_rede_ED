@@ -149,6 +149,9 @@ void DesenfileirarNotificacao(Usuario*& User);
 
 bool ComparaPost(Publicacao* atual, Publicacao* anterior);
 void TimestampSort(Usuario*& User, int k, Publicacao*& Posts[k]);
+
+bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior);
+void CurtidasSort(Usuario*& User, int k, Publicacao** Posts);
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username
