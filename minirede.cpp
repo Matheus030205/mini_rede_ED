@@ -98,7 +98,7 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
         }
         else
         {
-            saida << "ERROR INVALID_COMMAND\n" << std::endl;
+            saida << "ERROR INVALID_COMMAND" << std::endl;
             
             char c;
             while(entrada.get(c))
@@ -209,7 +209,7 @@ void seguirUsuario(MiniRede& rede, int idSeguidor, int idSeguido, std::ostream& 
     InserirNalistadeSeguidos(seguidor->seguidos,idSeguido);
     enfileirarNotificacao(seguido,'F',idSeguidor,-1);
 
-    saida << "USER_FOLLOWED" <<std:: endl;
+    saida << "FOLLOWED" <<std:: endl;
 }
 
 void listarSeguindo(MiniRede& rede, int idUsuario, std::ostream& saida) {
@@ -308,9 +308,9 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
             {
                 saida << "NOTIFICATION FOLLOW " << User->inicio_notificacoes->de_usuario_id << std:: endl;
             }
-            if(User->inicio_notificacoes->tipo == 'L')    
+            else if(User->inicio_notificacoes->tipo == 'L')    
             {
-                saida << "NOTIFICATION LIKE " << User->inicio_notificacoes->post_ID <<std:: endl;
+                saida << "NOTIFICATION LIKE " << User->inicio_notificacoes->de_usuario_id <<" "<< User->inicio_notificacoes->post_ID << std:: endl;
             }
             
             DesenfileirarNotificacao(User); // Aqui, ele altera o ponteiro da fila para a proxima notificação, e deleta a atual.
@@ -330,10 +330,10 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
     }
     else
     {
-        Publicacao** Posts = new Publicacao*[k];
+        Publicacao** Posts = new Publicacao*[k]();
         TimestampSort(rede,User, k,Posts);
         
-        saida << "FEED_BEGIN" << std:: endl;
+        saida << "FEED_BEGIN" << std::endl;
      
         for(int i = 0; i < k; i++)
         {
@@ -343,16 +343,16 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
            <<Posts[i]->autor_id<<" "
            <<Posts[i]->timestamp<<" "
            <<Posts[i]->qtd_likes<<" "
-           <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
+           <<Posts[i]->texto_da_publicacao<<std::endl;
         }
     
-        saida << "FEED_END" << std:: endl;
+        saida <<"FEED_END"<<std::endl;
         delete []Posts;
     }
 }
 
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
-    Publicacao** Posts = new Publicacao*[k];
+    Publicacao** Posts = new Publicacao*[k]();
     int qtde_post = 0;
     
     CurtidasSort(rede.raiz_id, k, qtde_post, Posts);
@@ -362,13 +362,12 @@ void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
     for(int i = 0; i < k; i++)
     {
         if (Posts[i]== nullptr)break;
-        
         saida << "POST " 
         <<Posts[i]->id_da_publicacao<<" "
         <<Posts[i]->autor_id<<" "
         <<Posts[i]->timestamp<<" "
         <<Posts[i]->qtd_likes<<" "
-        <<Posts[i]->texto_da_publicacao<<" " << std:: endl;
+        <<Posts[i]->texto_da_publicacao<<std::endl;
     }
 
     saida << "TOP_POSTS_END" << std:: endl;
