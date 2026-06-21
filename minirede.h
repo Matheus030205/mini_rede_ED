@@ -10,6 +10,31 @@ const int TAM_TEXTO = 280;
 const int TAM_COMANDO = 30;
 const int TAM_HASH = 997;
 
+struct NoListaUsuario
+{
+    int id;
+    NoListaUsuario *prox;
+};
+struct NoFilaNotificacoes
+{
+    char tipo;
+    int de_usuario_id;
+    int post_ID;
+    NoFilaNotificacoes* prox;
+    };
+struct Publicacao
+{
+    int id_da_publicacao;
+    int autor_id;
+    int timestamp;
+    char texto_da_publicacao[TAM_TEXTO];
+    int qtd_likes;
+    NoListaUsuario* curtidas;//LISTA DE IDS QUEM CURTIU O POST
+};struct NoLista_de_Post
+{
+    NoLista_de_Post*prox;
+    Publicacao *publicacao_atual;
+};
 
 
 struct Usuario
@@ -25,46 +50,12 @@ struct Usuario
 
 
 };
-
-struct Publicacao
-{
-    int id_da_publicacao;
-    int autor_id;
-    int timestamp;
-    char texto_da_publicacao[TAM_TEXTO];
-    int qtd_likes;
-
-    NoListaUsuario* curtidas;//LISTA DE IDS QUEM CURTIU O POST
-
-
-};
-
-struct NoListaUsuario
-{
-    int id;
-    NoListaUsuario *prox;
-};
-
 struct NoArvoreUsuarios
 {
     Usuario* usuario;
     NoArvoreUsuarios* esq;
     NoArvoreUsuarios* dir;
 };
-struct NoLista_de_Post
-{
-    NoLista_de_Post*prox;
-    Publicacao *publicacao_atual;
-};
-
-    struct NoFilaNotificacoes
-    {
-        char tipo;
-        int de_usuario_id;
-        int post_ID;
-        NoFilaNotificacoes* prox;
-    };
-
 struct NoHashUsuario
 {
     Usuario *usuario;
@@ -140,7 +131,7 @@ void InserirNalistadeSeguidos(NoListaUsuario*& inicio_lista,int id_a_seguir);
 void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,int id_do_post);
 void inserirNalistaPosts(NoLista_de_Post*& inicio_lista,int post_id,const char texto[],int autor_id,int timestamp);
 
-void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu);
+void inserirNaListaCurtidas(NoListaUsuario*& yinicio_lista,int id_quem_curitu);
 Publicacao* buscarPostNalista(NoLista_de_Post*inicio_lista,int id_procurado);
 bool jaCurtiuPost(NoListaUsuario* inicio_lista,int id_usuario);
 Usuario * buscarDonodoPost(NoArvoreUsuarios*raiz, int id_pos_procurado);
@@ -148,10 +139,10 @@ Usuario * buscarDonodoPost(NoArvoreUsuarios*raiz, int id_pos_procurado);
 void DesenfileirarNotificacao(Usuario*& User);
 
 bool ComparaPost(Publicacao* atual, Publicacao* anterior);
-void TimestampSort(Usuario*& User, int k, Publicacao*& Posts[k]);
+void TimestampSort(MiniRede& rede,Usuario*& User, int k, Publicacao** Posts);
 
 bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior);
-void CurtidasSort(Usuario*& User, int k, Publicacao** Posts);
+void CurtidasSort(NoArvoreUsuarios* raiz, int k,int& qtde_post, Publicacao** Posts);
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username

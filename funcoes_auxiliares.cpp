@@ -1,4 +1,4 @@
-#include "minirede.h";
+#include "minirede.h"
 #include <cstring>
 
 
@@ -87,7 +87,7 @@ Usuario* buscarArvoreporID(NoArvoreUsuarios*raiz,int id){
     {
         return nullptr;
     }
-    if (raiz ->usuario != nullptr && raiz->usuario->id){
+    if (raiz ->usuario != nullptr && raiz->usuario->id==id){
         return raiz->usuario;
     }
     if (id< raiz->usuario->id)
@@ -110,7 +110,7 @@ Usuario* buscarHashPorUsername(NoHashUsuario* tabela[],const char* username_proc
 
     NoHashUsuario* atual = tabela[indice];
     while(atual != nullptr){
-        if(atual->usuario != nullptr && strcmp(atual->usuario->username,username_procurado))
+        if(atual->usuario != nullptr && !strcmp(atual->usuario->username,username_procurado))
         {
             return atual->usuario;
         }
@@ -219,8 +219,8 @@ Publicacao* buscarPostNalista(NoLista_de_Post*inicio_lista,int id_procurado){
     }
     return nullptr;
 }
-void inserirNaListaCurtidas(NoListaUsuario* inicio_lista,int id_quem_curitu){
-    NoListaUsuario* novo_no -= new NoListaUsuario();
+void inserirNaListaCurtidas(NoListaUsuario*& inicio_lista,int id_quem_curitu){
+    NoListaUsuario* novo_no = new NoListaUsuario();
     novo_no->id = id_quem_curitu;
     novo_no-> prox = inicio_lista;
     inicio_lista=novo_no;
@@ -272,15 +272,18 @@ bool ComparaPost(Publicacao* atual, Publicacao* anterior){
     }
     return atual->id_da_publicacao < anterior->id_da_publicacao;
 }
-void TimestampSort(Usuario*& User, int k, Publicacao** Posts){
+void TimestampSort(MiniRede& rede,Usuario*& User, int k, Publicacao** Posts){
     NoListaUsuario* following = User->seguidos;
     int qtde_post = 0;
 
     while(following != nullptr)
     {
         Usuario* usuario_temp = buscarArvoreporID(rede.raiz_id,following->id);
-        NoLista_de_Post* post_temp = usuario_temp->posts_do_usuario;
+
         
+        if (usuario_temp != nullptr)
+        {
+             NoLista_de_Post* post_temp = usuario_temp->posts_do_usuario;
         while(post_temp != nullptr)
         {
             Publicacao* post_atual = post_temp->publicacao_atual;
@@ -323,6 +326,7 @@ void TimestampSort(Usuario*& User, int k, Publicacao** Posts){
             }
             
             post_temp = post_temp->prox;
+            }
         }
         
         following = following->prox;
@@ -332,14 +336,14 @@ void TimestampSort(Usuario*& User, int k, Publicacao** Posts){
 
 //FUNCAO AUXILIAR TOP POSTS
 bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior){
-    if(atual->curtidas != anterior->curtidas)
+    if(atual->qtd_likes != anterior->qtd_likes)
     {
-        return atual->curtidas > anterior->curtidas;
+        return atual->qtd_likes > anterior->qtd_likes;
     }
     return atual->id_da_publicacao < anterior->id_da_publicacao;
 }
 void CurtidasSort(NoArvoreUsuarios* raiz, int k, int& qtde_post, Publicacao** Posts){
-    if(raiz == nullptr) return nullptr;
+    if(raiz == nullptr) return;
     CurtidasSort(raiz->esq, k, qtde_post, Posts);
     CurtidasSort(raiz->dir, k, qtde_post, Posts);
 
