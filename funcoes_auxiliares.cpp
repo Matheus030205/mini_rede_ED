@@ -391,3 +391,48 @@ void CurtidasSort(NoArvoreUsuarios* raiz, int k, int& qtde_post, Publicacao** Po
         post_temp = post_temp->prox;
     }
 }
+//FUNCAO REMOCAO DE PUBLICACAO E UNFOLLOW
+void RemoverNoListaUsuario(NoListaUsuario*& inicio_lista,int id_remover){
+    NoListaUsuario* atual = inicio_lista;
+    NoListaUsuario* anterior = nullptr;
+
+    while (atual != nullptr){
+        if(atual->id == id_remover){
+            if (anterior == nullptr){
+                inicio_lista = atual->prox;
+            }else{
+                anterior->prox = atual->prox;
+            }
+            delete atual;
+            break;
+        }
+        anterior = atual;
+        atual= atual->prox;
+    }
+    
+}
+Publicacao* RemoverNolistaPost(NoLista_de_Post*& inicio_lista, int id_post){
+    NoLista_de_Post* atual = inicio_lista;
+    NoLista_de_Post *anterior = nullptr;
+    Publicacao* encontrado = nullptr;
+
+    while (atual!= nullptr)
+    {
+        if (atual->publicacao_atual != nullptr && atual->publicacao_atual->id_da_publicacao == id_post)
+        {
+            encontrado = atual->publicacao_atual;
+            if (anterior == nullptr)
+            {
+                inicio_lista = atual->prox;
+            }else{
+                anterior->prox = atual->prox;
+            }
+            delete atual;
+            return encontrado;
+    
+        }
+    anterior = atual;
+    atual = atual->prox;    
+    }
+    return nullptr;
+}

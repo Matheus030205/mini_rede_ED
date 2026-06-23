@@ -96,6 +96,19 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
             entrada >> k;
             listarTopPosts(rede, k, saida);
         }
+        else if (mnemonico == "UNFOLLOW")
+        {
+            int idSeguidor, idSeguido;
+            entrada >> idSeguidor >> idSeguidor;
+            UNFOLLOW(rede,idSeguidor,idSeguido,saida);
+        }
+        else if (mnemonico == "REMOVE_POST")
+        {
+            int idUsuario,idPost;
+            entrada >> idUsuario >> idPost;
+            RemoverPublicacao(rede,idUsuario,idPost,saida);
+        }
+                
         else
         {
             saida << "ERROR INVALID_COMMAND" << std::endl;
@@ -372,6 +385,50 @@ void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
 
     saida << "TOP_POSTS_END" << std:: endl;
     delete []Posts;
+}
+
+void UNFOLLOW(MiniRede &rede, int Id_seguidor, int idSeguido, std ::ostream &saida)
+{
+    Usuario *seguidor = buscarArvoreporID(rede.raiz_id,Id_seguidor);
+    Usuario* seguido = buscarArvoreporID(rede.raiz_id,idSeguido);
+
+    if (seguido == nullptr || seguidor == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND" <<std::endl;
+        return;
+    }
+    if (!jaSegueUsuario(seguidor->seguidos, idSeguido))
+    {
+        saida << "ERROR USER NOT_FOLLOWING" <<std::endl;
+        return;
+    }
+    RemoverNoListaUsuario(seguidor->seguidos, idSeguido);
+    saida<< "USER_UNFOLLOWED"<< std::endl;
+}
+
+void RemoverPublicacao(MiniRede &rede, int id_usuario,int id_post,std::ostream &saida){
+    Usuario* usuario = buscarArvoreporID(rede.raiz_id,id_usuario);
+    if (usuario == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND"<< std::endl;
+        return;
+    }
+    Publicacao* post_deletar = RemoverNolistaPost(usuario->posts_do_usuario,id_post);
+
+    if (post_deletar == nullptr)
+    {
+        saida << "ERROR POST_NOT_FOUND"<< std::endl;
+        return;
+    }
+    
+    RemoverNolistaPost(rede.todos_os_posts,id_post);
+
+    liberarListadeUsuarios(post_deletar->curtidas);
+    delete post_deletar;
+
+    saida<< "POST_REMOVED" <<std::endl;
+
+    
 }
 
 int main() {

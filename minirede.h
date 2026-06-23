@@ -143,6 +143,14 @@ void TimestampSort(MiniRede& rede,Usuario*& User, int k, Publicacao** Posts);
 
 bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior);
 void CurtidasSort(NoArvoreUsuarios* raiz, int k,int& qtde_post, Publicacao** Posts);
+// FUNCAO AUXILIAR COMANDO UNFOLLOW E DELETAR PUBLICACAO
+void RemoverNoListaUsuario(NoListaUsuario*& inicio_lista, int id_remover);
+Publicacao* RemoverNolistaPost(NoLista_de_Post*& inicio_lista,int idPost);
+
+void UNFOLLOW(MiniRede& rede,int id_seguidor,int id_seguido,std :: ostream& saida);
+void RemoverPublicacao(MiniRede& rede,int id_user,int id_post,std::ostream& saida);
+
+//FUNCAO AUXILIARES 
 // Exemplos de responsabilidades auxiliares:
 // - buscar usuario por id
 // - buscar usuario por username
