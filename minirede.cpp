@@ -11,19 +11,33 @@ void inicializarMiniRede(MiniRede& rede) {
 }
 
 void liberarMiniRede(MiniRede& rede) {
-    // TODO
-    liberarpostGLobal(rede);
-    liberarArvoredeUsuarios(rede.raiz_id);
+    liberarpostGLobal(rede); //Antes de deletar os posts do usuario, deletamos os ponteiros de usuarios que curtiram e comentara naqueles posts
+    liberarArvoredeUsuarios(rede.raiz_id); //Faz o papel de chamar as funçoes para deletar ponteiros da struct do usuario e o usuario em si.
     rede.raiz_id = nullptr;
     liberarTabelaHash(rede.tabela_usernames);
-
 }
 
 void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& saida) {
     std::string mnemonico;
+    bool primeira_leitura = true;
 
     while(entrada >> mnemonico)
     {
+        //Limpa o BOM se ele aparecer na primeira palavra do arquivo
+        if (primeira_leitura) {
+            primeira_leitura = false;
+            
+            // Verifica se os 3 primeiros bytes são o sinal do BOM UTF-8
+            if (mnemonico.size() >= 3 && 
+                (unsigned char)mnemonico[0] == 0xEF && 
+                (unsigned char)mnemonico[1] == 0xBB && 
+                (unsigned char)mnemonico[2] == 0xBF) {
+                
+                // Corta os 3 caracteres invisíveis e mantém apenas o comando real
+                mnemonico = mnemonico.substr(3); 
+            }
+        }
+
         if(mnemonico == "END"){
             break;
         } 
@@ -96,10 +110,24 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
             entrada >> k;
             listarTopPosts(rede, k, saida);
         }
+        else if(mnemonico == "ADD_COMMENT")
+        {
+            int idUsuario, idPost;
+            std::string comentario;
+            entrada >> idUsuario >> idPost;
+            std::getline(entrada>>std::ws,comentario);
+            ComentarPublicacao(rede, idUsuario, idPost, comentario.c_str(), saida);
+        }
+        else if(mnemonico == "COMMENTS")
+        {
+            int id_post;
+            entrada >> id_post;
+            ListarComentarios(rede, id_post, saida);
+        }
         else if (mnemonico == "UNFOLLOW")
         {
             int idSeguidor, idSeguido;
-            entrada >> idSeguidor >> idSeguidor;
+            entrada >> idSeguidor >> idSeguido;
             UNFOLLOW(rede,idSeguidor,idSeguido,saida);
         }
         else if (mnemonico == "REMOVE_POST")
@@ -108,15 +136,16 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
             entrada >> idUsuario >> idPost;
             RemoverPublicacao(rede,idUsuario,idPost,saida);
         }
-                
         else
         {
-            saida << "ERROR INVALID_COMMAND" << std::endl;
+            saida << "ERROR INVALID_COMMAND (Tamanho: " << mnemonico.size() 
+                  << " | Conteudo: [" << mnemonico << "])" << std::endl;
+            //saida << "ERROR INVALID_COMMAND" << std::endl;
             
             char c;
-            while(entrada.get(c))
+            while(entrada.get(c)) 
             {
-                if (c == '\n')
+                if (c == '\n') //Condição para nao quebrar o codigo caso tenha tido algum comando invalido/digitado errado
                 {
                     break;
                 }
@@ -127,12 +156,12 @@ void processarComandos(MiniRede& rede, std::istream& entrada, std::ostream& said
 }
 
 void cadastrarUsuario(MiniRede& rede, int id, const char username[], const char nomeCompleto[], std::ostream& saida) {
-    if (buscarArvoreporID(rede.raiz_id,id) != nullptr)
+    if (buscarArvoreporID(rede.raiz_id,id)!=nullptr) //Verifica se já nao existe
     {
         saida <<"ERROR USER_EXISTS"<< std::endl;
         return;
     }
-    if (buscarHashPorUsername(rede.tabela_usernames,username)!=nullptr )
+    if (buscarHashPorUsername(rede.tabela_usernames,username)!=nullptr) //Verifica se hash já nao existe
     {
         saida <<"ERROR USER_EXISTS"<< std :: endl;
         return;
@@ -140,16 +169,16 @@ void cadastrarUsuario(MiniRede& rede, int id, const char username[], const char 
     Usuario* novo_usuario = new Usuario;
 
     novo_usuario->id = id;
-    strcpy(novo_usuario->nome,nomeCompleto);
-    strcpy(novo_usuario->username, username);
+    strcpy(novo_usuario->nome,nomeCompleto); //Copia a string de nome completo para o endereço do nodo.
+    strcpy(novo_usuario->username, username); //Copia a string de username para o endereço do nodo.
     
     novo_usuario->posts_do_usuario = nullptr;
     novo_usuario->inicio_notificacoes = nullptr;
     novo_usuario->fim_notificacoes = nullptr;
     novo_usuario->seguidos = nullptr;
     
-    inserirnaArvore(rede.raiz_id,novo_usuario);
-    inserirNaTabelaHash(rede.tabela_usernames,novo_usuario);
+    inserirnaArvore(rede.raiz_id,novo_usuario); //Guarda usuario na arvore
+    inserirNaTabelaHash(rede.tabela_usernames,novo_usuario); //Gera hash e guarda o ponteiro na lista de hashs
 
     saida <<"USER_ADDED"<< std::endl;
     
@@ -220,7 +249,7 @@ void seguirUsuario(MiniRede& rede, int idSeguidor, int idSeguido, std::ostream& 
     }
 
     InserirNalistadeSeguidos(seguidor->seguidos,idSeguido);
-    enfileirarNotificacao(seguido,'F',idSeguidor,-1);
+    enfileirarNotificacao(seguido,'F',idSeguidor,-1,"");
 
     saida << "FOLLOWED" <<std:: endl;
 }
@@ -293,7 +322,7 @@ void curtirPublicacao(MiniRede& rede, int idUsuario, int idPost, std::ostream& s
     post_alvo->qtd_likes++;
     inserirNaListaCurtidas(post_alvo->curtidas,idUsuario);
 
-    enfileirarNotificacao(autor_post,'L',idUsuario,idPost);
+    enfileirarNotificacao(autor_post,'L',idUsuario,idPost,"");
 
     saida << "LIKED" << std:: endl;  
 }
@@ -307,7 +336,7 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
     }
     else if (User->inicio_notificacoes == nullptr)
     {
-        saida << "ERROR USER_DON'T_HAVE_NOTIFICATIONS" << std:: endl; //Usuario nao possui notificações
+        saida << "USER_DON'T_HAVE_NOTIFICATIONS" << std:: endl; //Usuario nao possui notificações
     }
     else
     {
@@ -325,7 +354,10 @@ void consultarNotificacoes(MiniRede& rede, int idUsuario, int k, std::ostream& s
             {
                 saida << "NOTIFICATION LIKE " << User->inicio_notificacoes->de_usuario_id <<" "<< User->inicio_notificacoes->post_ID << std:: endl;
             }
-            
+            else if(User->inicio_notificacoes->tipo == 'C')
+            {
+                saida << "NOTIFICATION COMMENT " << User->inicio_notificacoes->de_usuario_id <<" "<< User->inicio_notificacoes->post_ID << " "<< User->inicio_notificacoes->comentario<<std:: endl;
+            }
             DesenfileirarNotificacao(User); // Aqui, ele altera o ponteiro da fila para a proxima notificação, e deleta a atual.
             count++;
         }
@@ -343,8 +375,8 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
     }
     else
     {
-        Publicacao** Posts = new Publicacao*[k]();
-        TimestampSort(rede,User, k,Posts);
+        Publicacao** Posts = new Publicacao*[k](); //Aloca um vetor de publicações com o tamanho k para auxiliar na ordenação
+        TimestampSort(rede,User, k,Posts); 
         
         saida << "FEED_BEGIN" << std::endl;
      
@@ -360,15 +392,15 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida) {
         }
     
         saida <<"FEED_END"<<std::endl;
-        delete []Posts;
+        delete []Posts; //Deleta o vetor de ponteiros, liberando memoria.
     }
 }
 
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
-    Publicacao** Posts = new Publicacao*[k]();
+    Publicacao** Posts = new Publicacao*[k](); //Mesma ideia do gerarFeed
     int qtde_post = 0;
     
-    CurtidasSort(rede.raiz_id, k, qtde_post, Posts);
+    CurtidasSort(rede.raiz_id, k, qtde_post, Posts); //Aqui, iremos passar um int qtde_post, para auxiliar na ordenação
     
     saida << "TOP_POSTS_BEGIN" << std:: endl;
     
@@ -384,7 +416,7 @@ void listarTopPosts(MiniRede& rede, int k, std::ostream& saida) {
     }
 
     saida << "TOP_POSTS_END" << std:: endl;
-    delete []Posts;
+    delete []Posts; //Deleta o vetor de ponteiros, liberando memoria.
 }
 
 void UNFOLLOW(MiniRede &rede, int Id_seguidor, int idSeguido, std ::ostream &saida)
@@ -427,9 +459,67 @@ void RemoverPublicacao(MiniRede &rede, int id_usuario,int id_post,std::ostream &
     delete post_deletar;
 
     saida<< "POST_REMOVED" <<std::endl;
-
-    
 }
+
+void ComentarPublicacao(MiniRede& rede, int id_usuario, int id_post, const char comentario[], std::ostream& saida){
+    //O usuario x comenta na publicacao do usuario y.
+    Usuario* comentarista = buscarArvoreporID(rede.raiz_id, id_usuario);
+    if(comentarista == nullptr)
+    {
+        saida << "ERROR USER_NOT_FOUND" << std::endl;
+        return;
+    }
+    
+    Usuario* dono_do_post = buscarDonodoPost(rede.raiz_id, id_post);
+    if(dono_do_post == nullptr)
+    {
+        saida << "ERROR POST_NOT_FOUND" << std::endl;
+        return;
+    }
+    
+    Publicacao* post_alvo = buscarPostNalista(dono_do_post->posts_do_usuario, id_post);
+    if (post_alvo == nullptr)
+    {
+        saida << "ERROR POST_NOT_FOUND"<< std::endl;
+        return;
+    }
+
+    InserirNaListaComentarios(post_alvo->comentarios, comentarista->id, comentario); //Passamos como parametro o ponteiro da lista de comentarios daquele post 
+    enfileirarNotificacao(dono_do_post, 'C', id_usuario, id_post, comentario); //Dono do post recebe uma notificacao do comentário 
+
+    saida<< "COMMENT_ADDED" << std::endl;
+}
+
+void ListarComentarios(MiniRede& rede, int id_post, std::ostream& saida){
+    Usuario* autor_post = buscarDonodoPost(rede.raiz_id, id_post);
+    if(autor_post == nullptr)
+    {
+        saida << "ERROR POST_NOT_FOUND" << std::endl;
+        return;
+    }
+
+    Publicacao* post_alvo = buscarPostNalista(autor_post->posts_do_usuario, id_post);
+    if (post_alvo == nullptr)
+    {
+        saida << "ERROR POST_NOT_FOUND"<< std::endl;
+        return;
+    }
+    
+    NoListaComentarios* temp = post_alvo->comentarios;
+
+    saida <<"COMMENTS_BEGIN"<<std::endl;
+
+    while (temp != nullptr) //Percorrremos a lista de comentarios daquele post, printando quem comentou e o que comentou
+    {
+        saida << "COMMENT "
+        <<temp->id <<" "
+        <<temp->comentario<<std::endl;
+    
+        temp = temp->prox;
+    }
+    saida <<"COMMENTS_END"<<std::endl;
+}
+
 
 int main() {
     MiniRede rede;

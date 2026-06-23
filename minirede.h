@@ -15,13 +15,23 @@ struct NoListaUsuario
     int id;
     NoListaUsuario *prox;
 };
+
 struct NoFilaNotificacoes
 {
     char tipo;
     int de_usuario_id;
     int post_ID;
+    char comentario[TAM_TEXTO];
     NoFilaNotificacoes* prox;
-    };
+};
+
+struct NoListaComentarios
+{
+    int id; //Id do autor do comentario
+    char comentario[TAM_TEXTO];
+    NoListaComentarios* prox;
+};
+
 struct Publicacao
 {
     int id_da_publicacao;
@@ -30,7 +40,10 @@ struct Publicacao
     char texto_da_publicacao[TAM_TEXTO];
     int qtd_likes;
     NoListaUsuario* curtidas;//LISTA DE IDS QUEM CURTIU O POST
-};struct NoLista_de_Post
+    NoListaComentarios* comentarios; //no do inicio da LISTA DE COMENTARIOS 
+};
+
+struct NoLista_de_Post
 {
     NoLista_de_Post*prox;
     Publicacao *publicacao_atual;
@@ -47,47 +60,26 @@ struct Usuario
     NoLista_de_Post* posts_do_usuario;//No do inicio da lista de publicacoes
     NoFilaNotificacoes *inicio_notificacoes; //USADO PARA TIRAR NOTFICACOES MAIS RECENTES
     NoFilaNotificacoes *fim_notificacoes;// usado para adicionar NOTIFICACOES
-
-
 };
+
 struct NoArvoreUsuarios
 {
     Usuario* usuario;
     NoArvoreUsuarios* esq;
     NoArvoreUsuarios* dir;
 };
+
 struct NoHashUsuario
 {
     Usuario *usuario;
     NoHashUsuario *prox;
 };
 
-
-// TODO: definir as structs principais do trabalho.
-//
-// Sugestao de structs que provavelmente serao necessarias:
-// - Usuario
-// - Publicacao
-// - MiniRede
-// - nos para lista encadeada
-// - nos para arvore binaria de usuarios por id
-// - nos para tabela hash de usernames
-// - nos para fila de notificacoes
-//
-// Os campos de cada struct fazem parte do projeto dos alunos.
-
 struct MiniRede {
 
-    NoArvoreUsuarios* raiz_id; //USO No comando add_user,find_user e list_user
-    NoHashUsuario* tabela_usernames[TAM_HASH]; // USO PARA INDEXAR OS USUARIOS SOBRE A STRING DO USERNAME
+    NoArvoreUsuarios* raiz_id; 
+    NoHashUsuario* tabela_usernames[TAM_HASH]; 
     NoLista_de_Post* todos_os_posts;
-
-    // TODO: declarar aqui os ponteiros/estruturas principais da rede.
-    //
-    // Exemplos de responsabilidades:
-    // - usuarios armazenados por id
-    // - usuarios acessiveis por username
-    // - publicacoes cadastradas
 };
 
 void inicializarMiniRede(MiniRede& rede);
@@ -110,8 +102,7 @@ void gerarFeed(MiniRede& rede, int idUsuario, int k, std::ostream& saida);
 void listarTopPosts(MiniRede& rede, int k, std::ostream& saida);
 
 
-// TODO: declarar aqui as funcoes auxiliares escolhidas pelo grupo.
-//
+// Funções auxiliares
 void liberarListadeUsuarios(NoListaUsuario* inicio);
 void liberarpostGLobal(MiniRede& rede);
 void liberarListaPostdoUsuario(NoLista_de_Post* inicio);
@@ -128,7 +119,7 @@ void inserirNaTabelaHash(NoHashUsuario* tabela[], Usuario* novo_usuario);
 bool jaSegueUsuario(NoListaUsuario* inicio_lista,int id_alvo);
 void percorrerArvoreEmOrdem(NoArvoreUsuarios* raiz,std::ostream& saida);
 void InserirNalistadeSeguidos(NoListaUsuario*& inicio_lista,int id_a_seguir);
-void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,int id_do_post);
+void enfileirarNotificacao(Usuario* usuario_recebe,char tipo, int id_de_origem,int id_do_post, const char comment[]);
 void inserirNalistaPosts(NoLista_de_Post*& inicio_lista,int post_id,const char texto[],int autor_id,int timestamp);
 
 void inserirNaListaCurtidas(NoListaUsuario*& yinicio_lista,int id_quem_curitu);
@@ -143,22 +134,16 @@ void TimestampSort(MiniRede& rede,Usuario*& User, int k, Publicacao** Posts);
 
 bool ComparaCurtidas(Publicacao* atual, Publicacao* anterior);
 void CurtidasSort(NoArvoreUsuarios* raiz, int k,int& qtde_post, Publicacao** Posts);
-// FUNCAO AUXILIAR COMANDO UNFOLLOW E DELETAR PUBLICACAO
+
 void RemoverNoListaUsuario(NoListaUsuario*& inicio_lista, int id_remover);
 Publicacao* RemoverNolistaPost(NoLista_de_Post*& inicio_lista,int idPost);
 
 void UNFOLLOW(MiniRede& rede,int id_seguidor,int id_seguido,std :: ostream& saida);
 void RemoverPublicacao(MiniRede& rede,int id_user,int id_post,std::ostream& saida);
 
-//FUNCAO AUXILIARES 
-// Exemplos de responsabilidades auxiliares:
-// - buscar usuario por id
-// - buscar usuario por username
-// - buscar publicacao por id
-// - inserir/listar/liberar arvore
-// - inserir/buscar/liberar tabela hash
-// - enfileirar/desenfileirar notificacoes
-// - manipular listas encadeadas
-// - ordenar vetores auxiliares para feed e ranking
+void ComentarPublicacao(MiniRede& rede, int id_usuario, int id_post, const char comentario[], std::ostream& saida);
+void ListarComentarios(MiniRede& rede, int id_post, std::ostream& saida);
+void InserirNaListaComentarios(NoListaComentarios*& inicio_lista, int id_user, const char comment[]);
+void liberarListadeComentarios(NoListaComentarios* inicio);
 
 #endif
