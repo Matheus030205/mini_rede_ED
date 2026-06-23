@@ -456,6 +456,8 @@ void RemoverPublicacao(MiniRede &rede, int id_usuario,int id_post,std::ostream &
     RemoverNolistaPost(rede.todos_os_posts,id_post);
 
     liberarListadeUsuarios(post_deletar->curtidas);
+
+    liberarListadeComentarios(post_deletar->comentarios);
     delete post_deletar;
 
     saida<< "POST_REMOVED" <<std::endl;
